@@ -22,7 +22,7 @@ tokens :-
   do								{ \s -> Do }
   let								{ \s -> Let }
   in								{ \s -> In }
-  end								{ \s -> end }
+  end								{ \s -> End }
   of								{ \s -> Of }
   break								{ \s -> Break }
   nil								{ \s -> Nil }
@@ -47,10 +47,10 @@ tokens :-
   "/"								{ \s -> Divide }
   "="								{ \s -> Eq }
   "<>"								{ \s -> NEq }
-  "<"								{ \s -> LT }
-  "<="								{ \s -> LE }
-  ">"								{ \s -> GT }
-  ">="								{ \s -> GE }
+  "<"								{ \s -> Less }
+  "<="								{ \s -> LessEq }
+  ">"								{ \s -> Gr }
+  ">="								{ \s -> GrEq }
   "&"								{ \s -> And }
   "|"								{ \s -> Or }
   ":="								{ \s -> Assign }
@@ -66,8 +66,48 @@ tokens :-
 
 -- The token type:
 data Token =
-	Let 		|
-	In  		|
+	Array 		|
+	If  		|
+  Then      |
+  Else      |
+  While      |
+  For      |
+  To      |
+  Do      |
+  Let      |
+  In      |
+  End      |
+  Of      |
+  Break      |
+  Nil      |
+  Function      |
+  Var      |
+  Type      |
+  Import      |
+  Primitive      |
+  Coma      |
+  Colon         |
+  Semicolon     |
+  LRbrace       |
+  RRbrace       |
+  LSbrace       |
+  RSbrace       |
+  LCbrace       |
+  RCbrace       |
+  Dot           |
+  Plus          |
+  Minus         |
+  Multiply      |
+  Divide        |
+  Eq          |
+  NEq         |
+  Less          |
+  LessEq          |
+  Gr          |
+  GrEq          |
+  And         |
+  Or          |
+  Assign      |
 	Sym Char	|
 	Id String	|
 	Int Int
