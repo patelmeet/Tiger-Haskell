@@ -2,63 +2,72 @@
 module Main (main) where
 }
 
-%wrapper "basic"
+%wrapper "posn"
 
 $digit = [0-9]			-- digits
 $alpha = [a-zA-Z]		-- alphabetic characters
+@id = $alpha ($alpha | $digit | \_)*
+$u = [. \n]
+
+@octnum = \\ [0-3] [0-7] [0-7]
+@hexnum = \\x[0-9a-fA-F][0-9a-fA-F]
+@other = \\a | \\b | \\f | \\n | \\r | \\t | \\v | \\\\ | \\\"
 
 tokens :-
 
-  $white+							;
-  "//".*							;
-  "/*"[. \n]*"*/"					;
-  array								{ \s -> Array }
-  if								{ \s -> If }
-  then								{ \s -> Then }
-  else								{ \s -> Else }
-  while								{ \s -> While }
-  for								{ \s -> For }
-  to								{ \s -> To }
-  do								{ \s -> Do }
-  let								{ \s -> Let }
-  in								{ \s -> In }
-  end								{ \s -> End }
-  of								{ \s -> Of }
-  break								{ \s -> Break }
-  nil								{ \s -> Nil }
-  function							{ \s -> Function }
-  var								{ \s -> Var }
-  type								{ \s -> Type }
-  import							{ \s -> Import }
-  primitive							{ \s -> Primitive }
-  ","								{ \s -> Coma }
-  ":"								{ \s -> Colon }
-  ";"								{ \s -> Semicolon }
-  "("								{ \s -> LRbrace }
-  ")"								{ \s -> RRbrace }
-  "["								{ \s -> LSbrace }
-  "]"								{ \s -> RSbrace }
-  "{"								{ \s -> LCbrace }
-  "}"								{ \s -> RCbrace }
-  "."								{ \s -> Dot }
-  "+"								{ \s -> Plus }
-  "-"								{ \s -> Minus }
-  "*"								{ \s -> Multiply }
-  "/"								{ \s -> Divide }
-  "="								{ \s -> Eq }
-  "<>"								{ \s -> NEq }
-  "<"								{ \s -> Less }
-  "<="								{ \s -> LessEq }
-  ">"								{ \s -> Gr }
-  ">="								{ \s -> GrEq }
-  "&"								{ \s -> And }
-  "|"								{ \s -> Or }
-  ":="								{ \s -> Assign }
+  $white+						;
+  "//".*						                              ; --single line comment
+  "/*" ([$u # \*] | \* [$u # \/])* ("*")+ "/"     ; --multiline comment
+  array							{ \p s -> Array p }
+  if								{ \p s -> If p }
+  then							{ \p s -> Then p }
+  else							{ \p s -> Else p }
+  while							{ \p s -> While p }
+  for								{ \p s -> For p }
+  to								{ \p s -> To p }
+  do								{ \p s -> Do p }
+  let								{ \p s -> Let p }
+  in								{ \p s -> In p }
+  end								{ \p s -> End p }
+  of								{ \p s -> Of p }
+  break							{ \p s -> Break p }
+  nil								{ \p s -> Nil p }
+  function					{ \p s -> Function p }
+  var								{ \p s -> Var p }
+  type							{ \p s -> Type p }
+  import						{ \p s -> Import p }
+  primitive					{ \p s -> Primitive p }
+  ","								{ \p s -> Coma p }
+  ":"								{ \p s -> Colon p }
+  ";"								{ \p s -> Semicolon p }
+  "("								{ \p s -> LRbrace p }
+  ")"								{ \p s -> RRbrace p }
+  "["								{ \p s -> LSbrace p }
+  "]"								{ \p s -> RSbrace p }
+  "{"								{ \p s -> LCbrace p }
+  "}"								{ \p s -> RCbrace p }
+  "."								{ \p s -> Dot p }
+  "+"								{ \p s -> Plus p }
+  "-"								{ \p s -> Minus p }
+  "*"								{ \p s -> Multiply p }
+  "/"								{ \p s -> Divide p }
+  "="								{ \p s -> Eq p }
+  "<>"							{ \p s -> NEq p }
+  "<"								{ \p s -> Less p }
+  "<="							{ \p s -> LessEq p }
+  ">"								{ \p s -> Gr p }
+  ">="							{ \p s -> GrEq p }
+  "&"								{ \p s -> And p }
+  "|"								{ \p s -> Or p }
+  ":="						  { \p s -> Assign p }
 
-  $digit+							{ \s -> Int (read s) }
-  [\=\+\-\*\/\(\)]					{ \s -> Sym (head s) }
-  $alpha [$alpha $digit \_ \']*		{ \s -> Id s }
-  _main								{ \s -> Id s }
+
+  \" \"                                               { \p s -> Str (unquot s) p }
+  \" ([. # \\]* (@octnum | @hexnum | @other)* )* \"   { \p s -> Str (unquot s) p }
+
+  $digit+                 { \p s -> Int (read s) p }
+  @id                 		{ \p s -> Id s p }
+  _main								    { \p s -> Id s p }
 
 
 {
@@ -66,54 +75,66 @@ tokens :-
 
 -- The token type:
 data Token =
-	Array 		|
-	If  		|
-  Then      |
-  Else      |
-  While      |
-  For      |
-  To      |
-  Do      |
-  Let      |
-  In      |
-  End      |
-  Of      |
-  Break      |
-  Nil      |
-  Function      |
-  Var      |
-  Type      |
-  Import      |
-  Primitive      |
-  Coma      |
-  Colon         |
-  Semicolon     |
-  LRbrace       |
-  RRbrace       |
-  LSbrace       |
-  RSbrace       |
-  LCbrace       |
-  RCbrace       |
-  Dot           |
-  Plus          |
-  Minus         |
-  Multiply      |
-  Divide        |
-  Eq          |
-  NEq         |
-  Less          |
-  LessEq          |
-  Gr          |
-  GrEq          |
-  And         |
-  Or          |
-  Assign      |
-	Sym Char	|
-	Id String	|
-	Int Int
-	deriving (Eq,Show)
+	Array AlexPosn		  |
+	If AlexPosn 		    |
+  Then AlexPosn       |
+  Else AlexPosn       |
+  While AlexPosn      |
+  For AlexPosn        |
+  To AlexPosn         |
+  Do AlexPosn         |
+  Let AlexPosn        |
+  In AlexPosn         |
+  End AlexPosn        |
+  Of AlexPosn         |
+  Break AlexPosn      |
+  Nil AlexPosn        |
+  Function AlexPosn   |
+  Var AlexPosn        |
+  Type AlexPosn       |
+  Import AlexPosn     |
+  Primitive AlexPosn  |
+  Coma AlexPosn       |
+  Colon AlexPosn      |
+  Semicolon AlexPosn  |
+  LRbrace AlexPosn    |
+  RRbrace AlexPosn    |
+  LSbrace AlexPosn    |
+  RSbrace AlexPosn    |
+  LCbrace AlexPosn    |
+  RCbrace AlexPosn    |
+  Dot AlexPosn        |
+  Plus AlexPosn       |
+  Minus AlexPosn      |
+  Multiply AlexPosn   |
+  Divide AlexPosn     |
+  Eq AlexPosn         |
+  NEq AlexPosn        |
+  Less AlexPosn       |
+  LessEq AlexPosn     |
+  Gr AlexPosn         |
+  GrEq AlexPosn       |
+  And AlexPosn        |
+  Or AlexPosn         |
+  Assign AlexPosn     |
+
+	Str String AlexPosn |
+  Int Int AlexPosn    |
+  Id String AlexPosn
+
+  deriving (Eq,Show)
+
+
+unquot (x:xs) = init xs
+
+printElements :: [Token] -> IO()
+printElements [] = return ()
+printElements (x:xs) = do print(x)
+                          printElements xs
 
 main = do
   s <- getContents
-  print (alexScanTokens s)
+  let alltokens = alexScanTokens s
+//  printElements alltokens
+  
 }
