@@ -13,13 +13,14 @@ $u = [. \n]         --universal set
 
 @octnum = \\ [0-3] [0-7] [0-7]
 @hexnum = \\x[0-9a-fA-F][0-9a-fA-F]
-@other = \\a | \\b | \\f | \\n | \\r | \\t | \\v | \\\\ | \\\"
+@otherEscape = \\a | \\b | \\f | \\n | \\r | \\t | \\v | \\\\ | \\\"
 
 tokens :-
 
   $white+						;
   "//".*						                              ; --single line comment
   "/*" ([$u # \*] | \* [$u # \/])* ("*")* "*/"     ; --multiline comment
+  --keywords
   array							{ \p s -> Array p }
   if								{ \p s -> If p }
   then							{ \p s -> Then p }
@@ -39,6 +40,7 @@ tokens :-
   type							{ \p s -> Type p }
   import						{ \p s -> Import p }
   primitive					{ \p s -> Primitive p }
+  --operators
   ","								{ \p s -> Coma p }
   ":"								{ \p s -> Colon p }
   ";"								{ \p s -> Semicolon p }
@@ -63,9 +65,7 @@ tokens :-
   "|"								{ \p s -> Or p }
   ":="						  { \p s -> Assign p }
 
-
-  \" \"                                               { \p s -> String (unquot s) p }
-  \" ([. # \\]* (@octnum | @hexnum | @other)* )* \"   { \p s -> String (unquot s) p }
+  \" ([. # \\]* (@octnum | @hexnum | @otherEscape)* )* \"   { \p s -> String (unquot s) p }
 
   $digit+                 { \p s -> Number (read s) p }
   @id                 		{ \p s -> Identifier s p }
@@ -138,5 +138,5 @@ main = do
   s <- getContents
   let alltokens = alexScanTokens s
   printElements alltokens
-  
+--  print (alltokens)
 }
