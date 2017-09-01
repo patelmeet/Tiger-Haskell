@@ -6,8 +6,10 @@ module Main (main) where
 
 $digit = [0-9]			-- digits
 $alpha = [a-zA-Z]		-- alphabetic characters
+
+$u = [. \n]         --universal set
+
 @id = $alpha ($alpha | $digit | \_)*
-$u = [. \n]
 
 @octnum = \\ [0-3] [0-7] [0-7]
 @hexnum = \\x[0-9a-fA-F][0-9a-fA-F]
@@ -17,7 +19,7 @@ tokens :-
 
   $white+						;
   "//".*						                              ; --single line comment
-  "/*" ([$u # \*] | \* [$u # \/])* ("*")+ "/"     ; --multiline comment
+  "/*" ([$u # \*] | \* [$u # \/])* ("*")* "*/"     ; --multiline comment
   array							{ \p s -> Array p }
   if								{ \p s -> If p }
   then							{ \p s -> Then p }
@@ -62,12 +64,12 @@ tokens :-
   ":="						  { \p s -> Assign p }
 
 
-  \" \"                                               { \p s -> Str (unquot s) p }
-  \" ([. # \\]* (@octnum | @hexnum | @other)* )* \"   { \p s -> Str (unquot s) p }
+  \" \"                                               { \p s -> String (unquot s) p }
+  \" ([. # \\]* (@octnum | @hexnum | @other)* )* \"   { \p s -> String (unquot s) p }
 
-  $digit+                 { \p s -> Int (read s) p }
-  @id                 		{ \p s -> Id s p }
-  _main								    { \p s -> Id s p }
+  $digit+                 { \p s -> Number (read s) p }
+  @id                 		{ \p s -> Identifier s p }
+  _main								    { \p s -> Identifier s p }
 
 
 {
@@ -75,8 +77,8 @@ tokens :-
 
 -- The token type:
 data Token =
-	Array AlexPosn		  |
-	If AlexPosn 		    |
+  Array AlexPosn      |
+  If AlexPosn         |
   Then AlexPosn       |
   Else AlexPosn       |
   While AlexPosn      |
@@ -118,9 +120,9 @@ data Token =
   Or AlexPosn         |
   Assign AlexPosn     |
 
-	Str String AlexPosn |
-  Int Int AlexPosn    |
-  Id String AlexPosn
+  String String AlexPosn |
+  Number Int AlexPosn    |
+  Identifier String AlexPosn
 
   deriving (Eq,Show)
 
@@ -135,6 +137,6 @@ printElements (x:xs) = do print(x)
 main = do
   s <- getContents
   let alltokens = alexScanTokens s
-//  printElements alltokens
+  printElements alltokens
   
 }

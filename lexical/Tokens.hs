@@ -247,14 +247,14 @@ alex_deflt :: Array Int Int
 alex_deflt = listArray (0,142) [-1,33,33,-1,-1,-1,-1,-1,-1,-1,-1,16,16,-1,20,20,24,24,-1,-1,32,32,33,33,33,34,34,37,-1,-1,-1,37,37,33,41,41,-1,37,37,43,43,43,-1,43,-1,33,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,37,37,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 
 alex_accept = listArray (0::Int,142) [AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccSkip,AlexAccSkip,AlexAccSkip,AlexAccSkip,AlexAcc (alex_action_3),AlexAcc (alex_action_4),AlexAcc (alex_action_5),AlexAcc (alex_action_6),AlexAcc (alex_action_7),AlexAcc (alex_action_8),AlexAcc (alex_action_9),AlexAcc (alex_action_10),AlexAcc (alex_action_11),AlexAcc (alex_action_12),AlexAcc (alex_action_13),AlexAcc (alex_action_14),AlexAcc (alex_action_15),AlexAcc (alex_action_16),AlexAcc (alex_action_17),AlexAcc (alex_action_18),AlexAcc (alex_action_19),AlexAcc (alex_action_20),AlexAcc (alex_action_21),AlexAcc (alex_action_22),AlexAcc (alex_action_23),AlexAcc (alex_action_24),AlexAcc (alex_action_25),AlexAcc (alex_action_26),AlexAcc (alex_action_27),AlexAcc (alex_action_28),AlexAcc (alex_action_29),AlexAcc (alex_action_30),AlexAcc (alex_action_31),AlexAcc (alex_action_32),AlexAcc (alex_action_33),AlexAcc (alex_action_34),AlexAcc (alex_action_35),AlexAcc (alex_action_36),AlexAcc (alex_action_37),AlexAcc (alex_action_38),AlexAcc (alex_action_39),AlexAcc (alex_action_40),AlexAcc (alex_action_41),AlexAcc (alex_action_42),AlexAcc (alex_action_43),AlexAcc (alex_action_44),AlexAcc (alex_action_45),AlexAcc (alex_action_46),AlexAcc (alex_action_47),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_48),AlexAcc (alex_action_49)]
-{-# LINE 73 "Tokens.x" #-}
+{-# LINE 75 "Tokens.x" #-}
 
 -- Each action has type :: String -> Token
 
 -- The token type:
 data Token =
-	Array AlexPosn		  |
-	If AlexPosn 		    |
+  Array AlexPosn      |
+  If AlexPosn         |
   Then AlexPosn       |
   Else AlexPosn       |
   While AlexPosn      |
@@ -296,9 +296,9 @@ data Token =
   Or AlexPosn         |
   Assign AlexPosn     |
 
-	Str String AlexPosn |
-  Int Int AlexPosn    |
-  Id String AlexPosn
+  String String AlexPosn |
+  Number Int AlexPosn    |
+  Identifier String AlexPosn
 
   deriving (Eq,Show)
 
@@ -314,6 +314,7 @@ main = do
   s <- getContents
   let alltokens = alexScanTokens s
   printElements alltokens
+  
 
 alex_action_3 =  \p s -> Array p 
 alex_action_4 =  \p s -> If p 
@@ -357,11 +358,11 @@ alex_action_41 =  \p s -> GrEq p
 alex_action_42 =  \p s -> And p 
 alex_action_43 =  \p s -> Or p 
 alex_action_44 =  \p s -> Assign p 
-alex_action_45 =  \p s -> Str (unquot s) p 
-alex_action_46 =  \p s -> Str (unquot s) p 
-alex_action_47 =  \p s -> Int (read s) p 
-alex_action_48 =  \p s -> Id s p 
-alex_action_49 =  \p s -> Id s p 
+alex_action_45 =  \p s -> String (unquot s) p 
+alex_action_46 =  \p s -> String (unquot s) p 
+alex_action_47 =  \p s -> Number (read s) p 
+alex_action_48 =  \p s -> Identifier s p 
+alex_action_49 =  \p s -> Identifier s p 
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "<built-in>" #-}
